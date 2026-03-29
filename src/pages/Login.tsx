@@ -1,0 +1,165 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router';
+import { useAuth } from '../context/AuthContext';
+import { Mail, Lock, Shield, ArrowRight, Loader2 } from 'lucide-react';
+import api from '../api';
+
+export default function Login() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      // Make login request
+      const response = await api.post('/auth/login', formData);
+      const respData = response.data;
+      
+      if (respData.token && respData.student) {
+        login(respData.token, respData.student);
+        navigate('/');
+      } else {
+        setError('Login failed: Invalid response format');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-slate-900 font-sans text-slate-100">
+      {/* Form Left Side */}
+      <div className="flex w-full items-center justify-center p-8 lg:w-1/2">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center lg:text-left">
+            <h2 className="text-3xl font-bold tracking-tight text-white">Student Portal Login</h2>
+            <p className="mt-2 text-sm text-slate-400">
+              Don't have an account?{' '}
+              <Link to="/signup" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
+                Sign up
+              </Link>
+            </p>
+          </div>
+
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400 backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+                {error}
+              </div>
+            )}
+            
+            <div className="space-y-4">
+              {/* Email Input */}
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 group-focus-within:text-indigo-400 transition-colors">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <input
+                  id="email-address"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="block w-full rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-3 pl-10 text-slate-200 placeholder-slate-400 focus:border-indigo-500 focus:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all sm:text-sm"
+                  placeholder="Email address"
+                />
+              </div>
+
+              {/* Password Input */}
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 group-focus-within:text-indigo-400 transition-colors">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  className="block w-full rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-3 pl-10 text-slate-200 placeholder-slate-400 focus:border-indigo-500 focus:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all sm:text-sm"
+                  placeholder="Password"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900"
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-400">
+                    Remember me
+                  </label>
+                </div>
+
+                <div className="text-sm">
+                  <a href="#" className="font-medium text-indigo-400 hover:text-indigo-300">
+                    Forgot your password?
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-indigo-600/50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(79,70,229,0.5)] hover:shadow-[0_0_25px_rgba(79,70,229,0.7)]"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign in
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Visual Right Side */}
+      <div className="hidden w-1/2 flex-col justify-between bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 p-12 lg:flex relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+        <div className="z-10 flex w-full justify-end">
+          <div className="flex items-center gap-2 text-2xl font-bold tracking-tight text-white">
+            <Shield className="h-8 w-8 text-indigo-400" />
+            LogicBox LMS
+          </div>
+        </div>
+        <div className="z-10 max-w-lg self-end text-right">
+          <h1 className="mb-6 text-5xl font-extrabold leading-tight tracking-tight text-white">
+            Your Education. Simplified.
+          </h1>
+          <p className="text-lg text-indigo-200/80">
+            Sign in to access your dashboard, stream premium video lectures, and submit your homework seamlessly.
+          </p>
+        </div>
+        <div className="z-10 text-sm font-medium text-indigo-300 self-end">
+          &copy; {new Date().getFullYear()} LogicBox. All rights reserved.
+        </div>
+      </div>
+    </div>
+  );
+}
