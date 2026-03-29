@@ -23,8 +23,8 @@ export default function Layout() {
       <aside className="w-64 bg-slate-900 border-r border-slate-800 hidden md:flex flex-col shadow-sm">
         <div className="h-16 flex items-center px-6 border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-indigo-400" />
-            <span className="font-bold text-lg tracking-tight text-white">LogicBox <span className="text-indigo-400">LMS</span></span>
+            <Shield className="h-6 w-6 text-blue-400" />
+            <span className="font-bold text-lg tracking-tight text-white">LogicBox <span className="text-blue-400">LMS</span></span>
           </div>
         </div>
 
@@ -37,11 +37,11 @@ export default function Layout() {
                 to={item.path}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${
                   active 
-                    ? "bg-indigo-600/10 text-indigo-400" 
+                    ? "bg-blue-600/10 text-blue-400" 
                     : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
                 }`}
               >
-                <item.icon size={18} className={active ? "text-indigo-400" : ""} />
+                <item.icon size={18} className={active ? "text-blue-400" : ""} />
                 {item.label}
               </Link>
             );

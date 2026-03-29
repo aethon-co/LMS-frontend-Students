@@ -13,7 +13,7 @@ function ProtectedRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-indigo-400 font-semibold tracking-wide">Loading LogicBox LMS...</div>;
+    return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-blue-400 font-semibold tracking-wide">Loading LogicBox LMS...</div>;
   }
 
   if (!user) {

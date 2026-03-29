@@ -25,15 +25,15 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-100 font-sans">
-      <div className="bg-gradient-to-br from-slate-900 via-indigo-900/40 pos to-slate-900 rounded-3xl p-8 shadow-sm border border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+      <div className="bg-gradient-to-br from-slate-900 via-blue-900/40 pos to-slate-900 rounded-3xl p-8 shadow-sm border border-slate-800 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <h2 className="text-3xl font-extrabold mb-2 tracking-tight z-10 relative">Welcome back, {user?.name.split(' ')[0]}! 👋</h2>
         <p className="text-slate-400 text-lg z-10 relative">Ready to continue your learning journey today?</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4 hover:bg-slate-800 transition-colors">
-          <div className="p-4 bg-indigo-500/10 text-indigo-400 rounded-xl">
+          <div className="p-4 bg-blue-500/10 text-blue-400 rounded-xl">
             <BookOpen size={24} />
           </div>
           <div>
@@ -66,7 +66,7 @@ export default function Dashboard() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-white tracking-tight">Your Enrolled Batches</h3>
-          <Link to="/courses" className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-500/10 px-4 py-2 rounded-lg">
+          <Link to="/courses" className="text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 px-4 py-2 rounded-lg">
             View all
           </Link>
         </div>
@@ -88,16 +88,16 @@ export default function Dashboard() {
               >
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="inline-flex items-center rounded-md bg-indigo-500/10 px-2 py-1 text-xs font-medium text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
+                    <span className="inline-flex items-center rounded-md bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20">
                       Batch
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-1">{batch.name}</h3>
+                  <h3 className="text-lg font-semibold text-slate-100 group-hover:text-blue-400 transition-colors line-clamp-1">{batch.name}</h3>
                   <p className="mt-2 text-sm text-slate-400 line-clamp-2">
                     Course material: {batch.course?.name || 'Unknown Course'}
                   </p>
                 </div>
-                <div className="mt-6 flex items-center justify-between text-sm text-slate-300 group-hover:text-indigo-300">
+                <div className="mt-6 flex items-center justify-between text-sm text-slate-300 group-hover:text-blue-300">
                   <span className="font-medium">Enter course</span>
                   <BookOpen className="h-4 w-4" />
                 </div>

@@ -126,21 +126,21 @@ export default function CourseDetails() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-100 font-sans">
-      <div className="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-3xl p-8 border border-slate-800 relative shadow-[0_0_15px_rgba(79,70,229,0.1)]">
+      <div className="bg-gradient-to-r from-slate-900 to-blue-950 rounded-3xl p-8 border border-slate-800 relative shadow-[0_0_15px_rgba(79,70,229,0.1)]">
         <div className="flex items-center gap-3 mb-4">
-          <Link to="/courses" className="text-indigo-400 hover:text-indigo-300 transition-colors text-sm font-semibold tracking-wider uppercase">
+          <Link to="/courses" className="text-blue-400 hover:text-blue-300 transition-colors text-sm font-semibold tracking-wider uppercase">
             ← Back to Courses
           </Link>
         </div>
         <h1 className="text-4xl font-extrabold mb-2 tracking-tight text-white">{batch.name}</h1>
-        <p className="text-indigo-200/80 text-lg">{batch.course?.name || "Premium Course Material"}</p>
+        <p className="text-blue-200/80 text-lg">{batch.course?.name || "Premium Course Material"}</p>
       </div>
 
       {activeVideo && (
         <div className="bg-black rounded-3xl overflow-hidden shadow-2xl relative border border-slate-800 animate-in zoom-in-95 duration-300">
            <div className="absolute top-0 left-0 w-full p-4 bg-gradient-to-b from-black/90 to-transparent z-10 flex justify-between items-center text-white">
              <div className="flex items-center gap-2">
-               <Video className="w-5 h-5 text-indigo-400" />
+               <Video className="w-5 h-5 text-blue-400" />
                <h3 className="font-bold text-lg">{videoTitle}</h3>
              </div>
              <button onClick={() => setActiveVideo(null)} className="opacity-70 hover:opacity-100 font-bold px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors border border-white/10">Close Player</button>
@@ -163,7 +163,7 @@ export default function CourseDetails() {
           onClick={() => setActiveTab('lectures')}
           className={`px-6 py-4 text-sm font-semibold border-b-2 transition-all gap-2 flex items-center ${
             activeTab === 'lectures' 
-              ? 'border-indigo-500 text-indigo-400' 
+              ? 'border-blue-500 text-blue-400' 
               : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
           }`}
         >
@@ -173,7 +173,7 @@ export default function CourseDetails() {
           onClick={() => setActiveTab('assignments')}
           className={`px-6 py-4 text-sm font-semibold border-b-2 transition-all gap-2 flex items-center ${
             activeTab === 'assignments' 
-              ? 'border-indigo-500 text-indigo-400' 
+              ? 'border-blue-500 text-blue-400' 
               : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
           }`}
         >
@@ -194,12 +194,12 @@ export default function CourseDetails() {
              ) : (
                lectures.map((lecture, index) => (
                  <div key={lecture._id} onClick={() => handlePlayLecture(lecture._id, lecture.title)} className="group cursor-pointer bg-slate-800/50 p-4 rounded-2xl flex items-center gap-4 hover:bg-slate-800 border border-slate-700/50 transition-all shadow-sm hover:shadow-[0_0_15px_rgba(79,70,229,0.1)] hover:-translate-y-0.5">
-                    <div className="w-16 h-12 bg-slate-900 rounded-lg flex items-center justify-center text-indigo-400 group-hover:scale-110 group-hover:text-indigo-300 transition-all shadow-inner">
+                    <div className="w-16 h-12 bg-slate-900 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 group-hover:text-blue-300 transition-all shadow-inner">
                       <PlayCircle size={24} />
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-slate-100 group-hover:text-white transition-colors">
-                        <span className="text-indigo-400 mr-2">{index + 1}.</span>{lecture.title}
+                        <span className="text-blue-400 mr-2">{index + 1}.</span>{lecture.title}
                       </h4>
                       {lecture.description && <p className="text-sm text-slate-400 mt-1 line-clamp-1">{lecture.description}</p>}
                     </div>
@@ -242,15 +242,15 @@ export default function CourseDetails() {
                        {uploadProgress[a._id] ? (
                           <div className="w-full bg-slate-900 rounded-lg p-3 border border-slate-700">
                              <div className="w-full bg-slate-800 rounded-full h-2 mb-2 relative overflow-hidden">
-                               <div className="bg-indigo-500 h-2 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(79,70,229,0.5)]" style={{ width: `${uploadProgress[a._id]}%` }}></div>
+                               <div className="bg-blue-500 h-2 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(79,70,229,0.5)]" style={{ width: `${uploadProgress[a._id]}%` }}></div>
                              </div>
-                             <span className="text-xs font-bold text-center block animate-pulse text-indigo-400 uppercase tracking-widest">Uploading {Math.floor(uploadProgress[a._id])}%</span>
+                             <span className="text-xs font-bold text-center block animate-pulse text-blue-400 uppercase tracking-widest">Uploading {Math.floor(uploadProgress[a._id])}%</span>
                           </div>
                        ) : (
                           <button 
                             disabled={!!uploadingAssignmentId}
                             onClick={() => handleUploadClick(a._id)}
-                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 transition-all hover:shadow-[0_0_15px_rgba(79,70,229,0.4)] disabled:opacity-50 disabled:hover:bg-indigo-600 disabled:hover:shadow-none"
+                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 transition-all hover:shadow-[0_0_15px_rgba(79,70,229,0.4)] disabled:opacity-50 disabled:hover:bg-blue-600 disabled:hover:shadow-none"
                           >
                             <UploadCloud size={18} /> 
                             Submit Work

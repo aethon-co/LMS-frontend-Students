@@ -47,7 +47,7 @@ export default function Login() {
             <h2 className="text-3xl font-bold tracking-tight text-white">Student Portal Login</h2>
             <p className="mt-2 text-sm text-slate-400">
               Don't have an account?{' '}
-              <Link to="/signup" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
+              <Link to="/signup" className="font-semibold text-blue-400 hover:text-blue-300 transition-colors">
                 Sign up
               </Link>
             </p>
@@ -63,7 +63,7 @@ export default function Login() {
             <div className="space-y-4">
               {/* Email Input */}
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 group-focus-within:text-indigo-400 transition-colors">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 group-focus-within:text-blue-400 transition-colors">
                   <Mail className="h-5 w-5" />
                 </div>
                 <input
@@ -73,14 +73,14 @@ export default function Login() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="block w-full rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-3 pl-10 text-slate-200 placeholder-slate-400 focus:border-indigo-500 focus:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all sm:text-sm"
+                  className="block w-full rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-3 pl-10 text-slate-200 placeholder-slate-400 focus:border-blue-500 focus:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all sm:text-sm"
                   placeholder="Email address"
                 />
               </div>
 
               {/* Password Input */}
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 group-focus-within:text-indigo-400 transition-colors">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 group-focus-within:text-blue-400 transition-colors">
                   <Lock className="h-5 w-5" />
                 </div>
                 <input
@@ -90,7 +90,7 @@ export default function Login() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="block w-full rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-3 pl-10 text-slate-200 placeholder-slate-400 focus:border-indigo-500 focus:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all sm:text-sm"
+                  className="block w-full rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-3 pl-10 text-slate-200 placeholder-slate-400 focus:border-blue-500 focus:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all sm:text-sm"
                   placeholder="Password"
                 />
               </div>
@@ -101,7 +101,7 @@ export default function Login() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900"
+                    className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900"
                   />
                   <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-400">
                     Remember me
@@ -109,7 +109,7 @@ export default function Login() {
                 </div>
 
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-indigo-400 hover:text-indigo-300">
+                  <a href="#" className="font-medium text-blue-400 hover:text-blue-300">
                     Forgot your password?
                   </a>
                 </div>
@@ -120,7 +120,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-indigo-600/50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(79,70,229,0.5)] hover:shadow-[0_0_25px_rgba(79,70,229,0.7)]"
+                className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-blue-600/50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(79,70,229,0.5)] hover:shadow-[0_0_25px_rgba(79,70,229,0.7)]"
               >
                 {loading ? (
                   <>
@@ -140,11 +140,11 @@ export default function Login() {
       </div>
 
       {/* Visual Right Side */}
-      <div className="hidden w-1/2 flex-col justify-between bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 p-12 lg:flex relative overflow-hidden">
+      <div className="hidden w-1/2 flex-col justify-between bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 p-12 lg:flex relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
         <div className="z-10 flex w-full justify-end">
           <div className="flex items-center gap-2 text-2xl font-bold tracking-tight text-white">
-            <Shield className="h-8 w-8 text-indigo-400" />
+            <Shield className="h-8 w-8 text-blue-400" />
             LogicBox LMS
           </div>
         </div>
@@ -152,11 +152,11 @@ export default function Login() {
           <h1 className="mb-6 text-5xl font-extrabold leading-tight tracking-tight text-white">
             Your Education. Simplified.
           </h1>
-          <p className="text-lg text-indigo-200/80">
+          <p className="text-lg text-blue-200/80">
             Sign in to access your dashboard, stream premium video lectures, and submit your homework seamlessly.
           </p>
         </div>
-        <div className="z-10 text-sm font-medium text-indigo-300 self-end">
+        <div className="z-10 text-sm font-medium text-blue-300 self-end">
           &copy; {new Date().getFullYear()} LogicBox. All rights reserved.
         </div>
       </div>

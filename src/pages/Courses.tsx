@@ -52,18 +52,18 @@ export default function Courses() {
             >
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="inline-flex items-center rounded-md bg-indigo-500/10 px-2.5 py-1 text-xs font-semibold text-indigo-400 ring-1 ring-inset ring-indigo-500/20 uppercase tracking-widest">
+                  <span className="inline-flex items-center rounded-md bg-blue-500/10 px-2.5 py-1 text-xs font-semibold text-blue-400 ring-1 ring-inset ring-blue-500/20 uppercase tracking-widest">
                     Batch
                   </span>
                 </div>
-                <h3 className="text-xl font-bold text-slate-100 group-hover:text-indigo-400 transition-colors mb-2">
+                <h3 className="text-xl font-bold text-slate-100 group-hover:text-blue-400 transition-colors mb-2">
                   {batch.name}
                 </h3>
                 <p className="text-sm text-slate-400 flex-1">
                   Access course material, video lectures, and submit assignments seamlessly.
                 </p>
               </div>
-              <div className="mt-6 flex items-center justify-between text-sm text-slate-300 font-medium group-hover:text-indigo-400 transition-colors">
+              <div className="mt-6 flex items-center justify-between text-sm text-slate-300 font-medium group-hover:text-blue-400 transition-colors">
                 <span>Enter Course</span>
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </div>
