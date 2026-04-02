@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
-import { Video, FileText, UploadCloud, PlayCircle, TrendingUp, CheckCircle2, BookOpen, Eye, Pencil } from 'lucide-react';
+import { Video, FileText, UploadCloud, PlayCircle, TrendingUp, CheckCircle2, BookOpen, Eye, Pencil, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import api, { getStudentAttendance, uploadAssignmentViaApi } from '../api';
 
@@ -82,7 +82,6 @@ export default function CourseDetails() {
             setCompletedCount(completedLectures ?? 0);
             setTotalLectures(tl ?? fetchedLectures.length);
 
-            // Populate already-completed set so we don't re-send
             const completedSet = new Set<string>();
             for (const item of (lp || [])) {
               if (item.isCompleted) completedSet.add(item.lectureId);
@@ -131,7 +130,6 @@ export default function CourseDetails() {
         }
       }));
 
-      // Recalculate completion counts
       setLectureProgress(prev => {
         const values = Object.values({ ...prev, [lectureId]: { isCompleted: updated.isCompleted, watchedSeconds: updated.watchedSeconds, lastPosition: updated.lastPosition } });
         const completed = values.filter((v: any) => v.isCompleted).length;
@@ -154,13 +152,11 @@ export default function CourseDetails() {
     const duration = video.duration;
     const watchedPct = currentTime / duration;
 
-    // Debounce: send update every 5 seconds of real time
     if (progressDebounceRef.current) clearTimeout(progressDebounceRef.current);
     progressDebounceRef.current = setTimeout(() => {
       sendProgressUpdate(lId, currentTime, duration, currentTime);
     }, 5000);
 
-    // Eagerly mark completed in UI at threshold, send immediately
     if (watchedPct >= COMPLETION_THRESHOLD && !reportedCompletedRef.current.has(lId)) {
       reportedCompletedRef.current.add(lId);
       if (progressDebounceRef.current) clearTimeout(progressDebounceRef.current);
@@ -168,7 +164,6 @@ export default function CourseDetails() {
     }
   }, [activeLectureId, sendProgressUpdate]);
 
-  // Flush progress when video is paused or closed
   const handleVideoPause = useCallback(() => {
     const video = videoRef.current;
     const lId = activeLectureId;
@@ -178,7 +173,6 @@ export default function CourseDetails() {
   }, [activeLectureId, sendProgressUpdate]);
 
   const handlePlayLecture = async (lectureId: string, title: string) => {
-    // Flush prior video progress
     if (videoRef.current && activeLectureId && videoRef.current.duration) {
       await sendProgressUpdate(activeLectureId, videoRef.current.currentTime, videoRef.current.duration, videoRef.current.currentTime);
     }
@@ -261,11 +255,11 @@ export default function CourseDetails() {
   }, [pushToast]);
 
   if (loading) {
-    return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Loading curriculum...</div>;
+    return <div className="p-12 text-center text-slate-500 dark:text-[#5a6474] font-medium animate-pulse">Loading curriculum...</div>;
   }
 
   if (!batch) {
-    return <div className="p-12 text-center text-red-400 font-bold bg-red-500/10 border border-red-500/20 rounded-xl max-w-lg mx-auto mt-12">Course access error.</div>;
+    return <div className="p-12 text-center text-red-500 dark:text-[#ef4444] font-medium bg-red-50 dark:bg-[#0c0e12] border border-red-200 dark:border-[#7f1d1d] rounded-xl max-w-lg mx-auto mt-12">Course access error.</div>;
   }
 
   const completedLectures = new Set(
@@ -273,159 +267,113 @@ export default function CourseDetails() {
       .filter(([, v]) => v.isCompleted)
       .map(([k]) => k)
   );
-  const attendancePercentage =
-    batchAttendance && typeof batchAttendance.percentage === 'number'
-      ? batchAttendance.percentage
-      : null;
+  
+  const attendancePercentage = batchAttendance?.percentage ?? null;
   const hasAttendanceSessions = (batchAttendance?.totalClasses ?? 0) > 0;
-  const attendanceTone = !hasAttendanceSessions
-    ? 'empty'
-    : attendancePercentage !== null && attendancePercentage >= 75
-      ? 'good'
-      : attendancePercentage !== null && attendancePercentage >= 50
-        ? 'warn'
-        : 'bad';
+  const attendanceTone = !hasAttendanceSessions ? 'empty' : 
+                         attendancePercentage !== null && attendancePercentage >= 75 ? 'good' : 
+                         attendancePercentage !== null && attendancePercentage >= 50 ? 'warn' : 'bad';
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-100 font-sans">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 font-sans">
       <div className="fixed top-4 right-4 z-50 flex w-full max-w-sm flex-col gap-3 pointer-events-none">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto rounded-2xl border px-4 py-3 shadow-xl backdrop-blur ${
+            className={`pointer-events-auto rounded-xl border px-4 py-3 shadow-sm ${
               toast.type === 'success'
-                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100'
-                : 'border-red-500/30 bg-red-500/10 text-red-100'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-[#065f46] dark:bg-[#052e1e] dark:text-[#a7f3d0]'
+                : 'border-red-200 bg-red-50 text-red-800 dark:border-[#7f1d1d] dark:bg-[#2d0f0f] dark:text-[#fecaca]'
             }`}
           >
-            <p className="text-sm font-semibold">{toast.message}</p>
+            <p className="text-sm font-medium">{toast.message}</p>
           </div>
         ))}
       </div>
-      <div className="bg-gradient-to-r from-slate-900 to-blue-950 rounded-3xl p-8 border border-slate-800 relative shadow-[0_0_15px_rgba(79,70,229,0.1)]">
-        <div className="flex items-center gap-3 mb-4">
-          <Link to="/courses" className="text-blue-400 hover:text-blue-300 transition-colors text-sm font-semibold tracking-wider uppercase">
-            ← Back to Courses
-          </Link>
-        </div>
-        <h1 className="text-4xl font-extrabold mb-2 tracking-tight text-white">{batch.name}</h1>
-        <p className="text-blue-200/80 text-lg">{batch.course?.name || "Premium Course Material"}</p>
+      
+      {/* Header */}
+      <div className="border-b border-slate-200 dark:border-[#242830] pb-6">
+        <Link to="/courses" className="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-sm font-medium mb-4">
+          <ArrowLeft size={16} /> Back to Curriculum
+        </Link>
+        <h1 className="text-3xl font-semibold text-slate-900 dark:text-[#f0f2f5] mb-2">{batch.name}</h1>
+        <p className="text-slate-500 dark:text-[#8b95a2] text-lg">{batch.course?.name || "Premium Course Material"}</p>
+      </div>
 
+      <div className="grid md:grid-cols-2 gap-6">
         {/* Course Completion Progress */}
         {totalLectures > 0 && (
-          <div className="mt-6 bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-blue-400" />
-                <span className="text-sm font-semibold text-slate-300">Course Completion</span>
+          <div className="bg-white dark:bg-[#13151a] rounded-xl p-6 border border-slate-200 dark:border-[#242830] flex flex-col justify-center">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 text-slate-900 dark:text-[#f0f2f5]">
+                <BookOpen size={18} />
+                <span className="text-sm font-medium">Course Progress</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">{completedCount}/{totalLectures} lectures</span>
-                <span className={`text-lg font-extrabold ${courseCompletionPercentage === 100 ? 'text-emerald-400' : 'text-blue-400'}`}>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-500 dark:text-[#8b95a2]">{completedCount} of {totalLectures} lectures</span>
+                <span className={`text-lg font-bold ${courseCompletionPercentage === 100 ? 'text-emerald-600 dark:text-[#10b981]' : 'text-blue-600 dark:text-blue-400'}`}>
                   {courseCompletionPercentage}%
                 </span>
               </div>
             </div>
-            <div className="w-full bg-slate-700 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full bg-slate-100 dark:bg-[#1a1d24] rounded-full h-2 overflow-hidden">
               <div
-                className={`h-2.5 rounded-full transition-all duration-700 ${courseCompletionPercentage === 100 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-blue-500 shadow-[0_0_10px_rgba(79,70,229,0.4)]'}`}
+                className={`h-2 rounded-full transition-all duration-700 ${courseCompletionPercentage === 100 ? 'bg-emerald-500 dark:bg-[#10b981]' : 'bg-blue-600 dark:bg-blue-500'}`}
                 style={{ width: `${courseCompletionPercentage}%` }}
               />
             </div>
-            {courseCompletionPercentage === 100 && (
-              <div className="flex items-center gap-2 mt-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-emerald-400 text-xs font-semibold">🎉 Course Completed!</span>
-              </div>
-            )}
           </div>
         )}
-      </div>
 
-      {/* Attendance Banner */}
-      {batchAttendance && (
-        <div className={`rounded-2xl p-5 border flex items-center justify-between ${
-          attendanceTone === 'good'
-            ? 'bg-emerald-500/5 border-emerald-500/20'
-            : attendanceTone === 'warn'
-              ? 'bg-amber-500/5 border-amber-500/20'
-              : attendanceTone === 'bad'
-                ? 'bg-red-500/5 border-red-500/20'
-                : 'bg-slate-800/40 border-slate-700/50'
-        }`}>
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl ${
-              attendanceTone === 'good'
-                ? 'bg-emerald-500/10'
-                : attendanceTone === 'warn'
-                  ? 'bg-amber-500/10'
-                  : attendanceTone === 'bad'
-                    ? 'bg-red-500/10'
-                    : 'bg-slate-700/40'
-            }`}>
-              <TrendingUp className={`w-5 h-5 ${
-                attendanceTone === 'good'
-                  ? 'text-emerald-400'
-                  : attendanceTone === 'warn'
-                    ? 'text-amber-400'
-                    : attendanceTone === 'bad'
-                      ? 'text-red-400'
-                      : 'text-slate-400'
-              }`} />
+        {/* Attendance Banner */}
+        {batchAttendance && (
+          <div className="bg-white dark:bg-[#13151a] rounded-xl p-6 border border-slate-200 dark:border-[#242830] flex flex-col justify-center">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 text-slate-900 dark:text-[#f0f2f5]">
+                <TrendingUp size={18} />
+                <span className="text-sm font-medium">Your Attendance</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-500 dark:text-[#8b95a2]">
+                  {hasAttendanceSessions ? `${batchAttendance.attendedClasses} of ${batchAttendance.totalClasses} classes` : 'No classes'}
+                </span>
+                <span className={`text-lg font-bold ${
+                  attendanceTone === 'good' ? 'text-emerald-600 dark:text-[#10b981]' :
+                  attendanceTone === 'warn' ? 'text-amber-600 dark:text-[#f59e0b]' :
+                  attendanceTone === 'bad' ? 'text-red-600 dark:text-[#ef4444]' : 'text-slate-400 dark:text-[#5a6474]'
+                }`}>
+                  {attendancePercentage !== null ? `${attendancePercentage}%` : '--'}
+                </span>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-white">Your Attendance</p>
-              <p className="text-xs text-slate-400">
-                {hasAttendanceSessions
-                  ? `${batchAttendance.attendedClasses} of ${batchAttendance.totalClasses} classes attended`
-                  : 'No classes held yet'}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-24 bg-slate-700 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-slate-100 dark:bg-[#1a1d24] rounded-full h-2 overflow-hidden">
               <div
                 className={`h-2 rounded-full transition-all duration-500 ${
-                  attendanceTone === 'good'
-                    ? 'bg-emerald-500'
-                    : attendanceTone === 'warn'
-                      ? 'bg-amber-500'
-                      : attendanceTone === 'bad'
-                        ? 'bg-red-500'
-                        : 'bg-slate-500'
+                  attendanceTone === 'good' ? 'bg-emerald-500 dark:bg-[#10b981]' :
+                  attendanceTone === 'warn' ? 'bg-amber-500 dark:bg-[#f59e0b]' :
+                  attendanceTone === 'bad' ? 'bg-red-500 dark:bg-[#ef4444]' : 'bg-slate-400 dark:bg-[#5a6474]'
                 }`}
                 style={{ width: `${attendancePercentage ?? 0}%` }}
               />
             </div>
-            <span className={`text-2xl font-extrabold ${
-              attendanceTone === 'good'
-                ? 'text-emerald-400'
-                : attendanceTone === 'warn'
-                  ? 'text-amber-400'
-                  : attendanceTone === 'bad'
-                    ? 'text-red-400'
-                    : 'text-slate-300'
-            }`}>
-              {attendancePercentage !== null ? `${attendancePercentage}%` : '--'}
-            </span>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Video Player */}
       {activeVideo && (
-        <div className="bg-black rounded-3xl overflow-hidden shadow-2xl relative border border-slate-800 animate-in zoom-in-95 duration-300">
-          <div className="absolute top-0 left-0 w-full p-4 bg-gradient-to-b from-black/90 to-transparent z-10 flex justify-between items-center text-white">
+        <div className="bg-[#0c0e12] rounded-xl overflow-hidden border border-slate-200 dark:border-[#242830] animate-in slide-in-from-top-4 duration-300">
+          <div className="p-4 bg-slate-50 border-b border-slate-200 dark:bg-[#13151a] dark:border-[#242830] flex justify-between items-center text-slate-900 dark:text-[#f0f2f5]">
             <div className="flex items-center gap-2">
-              <Video className="w-5 h-5 text-blue-400" />
-              <h3 className="font-bold text-lg">{videoTitle}</h3>
+              <Video className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <h3 className="font-medium text-sm">{videoTitle}</h3>
               {activeLectureId && completedLectures.has(activeLectureId) && (
-                <span className="flex items-center gap-1 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-xs font-semibold text-emerald-400">
+                <span className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 dark:bg-[#052e1e] border border-emerald-200 dark:border-[#065f46] rounded-md text-xs font-medium text-emerald-700 dark:text-[#10b981]">
                   <CheckCircle2 className="w-3 h-3" /> Completed
                 </span>
               )}
             </div>
-            <button onClick={handleCloseVideo} className="opacity-70 hover:opacity-100 font-bold px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors border border-white/10">Close Player</button>
+            <button onClick={handleCloseVideo} className="text-xs font-medium px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-[#242830] dark:hover:bg-[#1e2128] rounded-md transition-colors text-slate-700 dark:text-[#f0f2f5]">Close Player</button>
           </div>
           <video
             ref={videoRef}
@@ -437,41 +385,39 @@ export default function CourseDetails() {
             onTimeUpdate={handleTimeUpdate}
             onPause={handleVideoPause}
             onEnded={handleVideoPause}
-          >
-            Your browser does not support the video tag.
-          </video>
+          />
         </div>
       )}
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-800">
+      <div className="flex gap-4 border-b border-slate-200 dark:border-[#242830]">
         <button
           onClick={() => setActiveTab('lectures')}
-          className={`px-6 py-4 text-sm font-semibold border-b-2 transition-all gap-2 flex items-center ${
-            activeTab === 'lectures' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+          className={`pb-3 text-sm font-medium border-b-2 transition-all flex items-center gap-2 ${
+            activeTab === 'lectures' ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-[#8b95a2] dark:hover:text-[#f0f2f5]'
           }`}
         >
-          <Video size={18} /> Video Curriculum
+          Video Curriculum
         </button>
         <button
           onClick={() => setActiveTab('assignments')}
-          className={`px-6 py-4 text-sm font-semibold border-b-2 transition-all gap-2 flex items-center ${
-            activeTab === 'assignments' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+          className={`pb-3 text-sm font-medium border-b-2 transition-all flex items-center gap-2 ${
+            activeTab === 'assignments' ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-[#8b95a2] dark:hover:text-[#f0f2f5]'
           }`}
         >
-          <FileText size={18} /> Assignments
+          Assignments
         </button>
       </div>
 
       {/* Content */}
       <div className="pt-2">
         {activeTab === 'lectures' && (
-          <div className="grid gap-4">
+          <div className="space-y-3">
             {lectures.length === 0 ? (
-              <div className="text-center py-16 text-slate-400 border border-dashed border-slate-700/50 bg-slate-800/20 rounded-2xl flex flex-col items-center">
-                <Video className="w-12 h-12 text-slate-600 mb-3" />
-                <p className="font-medium text-lg text-slate-200">No video lectures yet.</p>
-                <p className="text-sm">Check back later when curriculum is assigned.</p>
+              <div className="text-center py-16 text-slate-500 dark:text-[#5a6474] border border-dashed border-slate-300 dark:border-[#242830] bg-slate-50 dark:bg-[#1a1d24] rounded-xl flex flex-col items-center">
+                <Video className="w-8 h-8 text-slate-400 dark:text-[#5a6474] mb-3" />
+                <p className="font-medium text-sm text-slate-900 dark:text-[#f0f2f5]">No video lectures yet</p>
+                <p className="text-xs mt-1">Check back later when curriculum is assigned.</p>
               </div>
             ) : (
               lectures.map((lecture, index) => {
@@ -482,46 +428,33 @@ export default function CourseDetails() {
                   <div
                     key={lecture._id}
                     onClick={() => handlePlayLecture(lecture._id, lecture.title)}
-                    className={`group cursor-pointer p-4 rounded-2xl flex items-center gap-4 border transition-all shadow-sm hover:-translate-y-0.5 ${
+                    className={`cursor-pointer p-4 rounded-xl flex items-center gap-4 border transition-colors ${
                       isActive
-                        ? 'bg-blue-900/30 border-blue-500/50 shadow-[0_0_15px_rgba(79,70,229,0.2)]'
+                        ? 'bg-blue-50 border-blue-200 dark:bg-[#1e2a3d] dark:border-[#2d4a7a]'
                         : isCompleted
-                          ? 'bg-emerald-900/10 border-emerald-500/20 hover:bg-emerald-900/20'
-                          : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800 hover:shadow-[0_0_15px_rgba(79,70,229,0.1)]'
+                          ? 'bg-emerald-50 border-emerald-200 dark:bg-[#052e1e] dark:border-[#065f46] hover:border-emerald-300 dark:hover:border-[#10b981]'
+                          : 'bg-white border-slate-200 dark:bg-[#13151a] dark:border-[#242830] hover:border-slate-300 dark:hover:border-[#5a6474]'
                     }`}
                   >
-                    <div className={`w-16 h-12 rounded-lg flex items-center justify-center transition-all shadow-inner ${
-                      isCompleted ? 'bg-emerald-900/30' : 'bg-slate-900 group-hover:scale-110'
-                    }`}>
-                      {isCompleted
-                        ? <CheckCircle2 className="w-6 h-6 text-emerald-400" />
-                        : <PlayCircle size={24} className={`${isActive ? 'text-blue-400' : 'text-slate-400 group-hover:text-blue-300'} transition-colors`} />
+                    <div className="w-12 h-10 shrink-0 bg-slate-100 dark:bg-[#1a1d24] rounded-lg flex items-center justify-center">
+                       {isCompleted
+                        ? <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-[#10b981]" />
+                        : <PlayCircle size={20} className={`${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-[#5a6474]'} transition-colors`} />
                       }
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className={`font-semibold transition-colors ${isCompleted ? 'text-emerald-300' : 'text-slate-100 group-hover:text-white'}`}>
-                        <span className={`mr-2 ${isCompleted ? 'text-emerald-500' : 'text-blue-400'}`}>{index + 1}.</span>{lecture.title}
+                      <h4 className={`text-sm font-medium transition-colors ${isCompleted ? 'text-emerald-800 dark:text-[#10b981]' : isActive ? 'text-blue-800 dark:text-blue-400' : 'text-slate-900 dark:text-[#f0f2f5]'}`}>
+                        <span className={`mr-2 ${isCompleted ? 'text-emerald-500 dark:text-[#065f46]' : 'text-slate-400 dark:text-[#5a6474]'}`}>{index + 1}.</span>{lecture.title}
                       </h4>
-                      {lecture.description && <p className="text-sm text-slate-400 mt-1 line-clamp-1">{lecture.description}</p>}
                       {prog && prog.watchedSeconds > 0 && !isCompleted && (
-                        <div className="mt-2 flex items-center gap-2">
-                          <div className="flex-1 bg-slate-700/50 rounded-full h-1 overflow-hidden max-w-[160px]">
+                        <div className="mt-1 flex items-center gap-2">
+                          <div className="flex-1 bg-slate-200 dark:bg-[#242830] rounded-full h-1 max-w-[120px]">
                             <div className="bg-blue-500 h-1 rounded-full" style={{ width: `${Math.min(100, (prog.watchedSeconds / 1) * 0)}%` }} />
                           </div>
-                          <span className="text-xs text-slate-500">In Progress</span>
+                          <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-[#8b95a2]">In Progress</span>
                         </div>
                       )}
                     </div>
-                    {isCompleted && (
-                      <span className="shrink-0 flex items-center gap-1 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-xs font-semibold text-emerald-400">
-                        <CheckCircle2 className="w-3 h-3" /> Done
-                      </span>
-                    )}
-                    {!isCompleted && prog && prog.watchedSeconds > 5 && (
-                      <span className="shrink-0 px-2.5 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-xs font-semibold text-blue-400">
-                        In Progress
-                      </span>
-                    )}
                   </div>
                 );
               })
@@ -530,70 +463,76 @@ export default function CourseDetails() {
         )}
 
         {activeTab === 'assignments' && (
-          <div className="grid gap-6">
+          <div className="space-y-4">
             <input type="file" ref={fileInputRef} className="hidden" onChange={onFileChange} />
             {assignments.length === 0 ? (
-              <div className="text-center py-16 text-slate-400 border border-dashed border-slate-700/50 bg-slate-800/20 rounded-2xl flex flex-col items-center">
-                <FileText className="w-12 h-12 text-slate-600 mb-3" />
-                <p className="font-medium text-slate-200 text-lg">No assignments due.</p>
-                <p className="text-sm">Enjoy your free time!</p>
+              <div className="text-center py-16 text-slate-500 dark:text-[#5a6474] border border-dashed border-slate-300 dark:border-[#242830] bg-slate-50 dark:bg-[#1a1d24] rounded-xl flex flex-col items-center">
+                <FileText className="w-8 h-8 text-slate-400 dark:text-[#5a6474] mb-3" />
+                <p className="font-medium text-sm text-slate-900 dark:text-[#f0f2f5]">No assignments due</p>
+                <p className="text-xs mt-1">Check back later for new tasks.</p>
               </div>
             ) : (
               assignments.map(a => {
                 const submission = a.studentSubmission;
                 const hasSubmission = Boolean(submission?.hasFile);
                 return (
-                <div key={a._id} className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 shadow-sm flex flex-col md:flex-row gap-6 md:items-start transition-colors hover:bg-slate-800">
+                <div key={a._id} className="bg-white dark:bg-[#13151a] p-5 rounded-xl border border-slate-200 dark:border-[#242830] flex flex-col md:flex-row gap-5 md:items-start">
                   <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-                      <h4 className="text-xl font-bold text-white tracking-tight">{a.name}</h4>
-                      <span className="w-fit px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold rounded-md uppercase tracking-wide">
-                        Due {new Date(a.dueDate).toLocaleDateString()}
-                      </span>
-                      {hasSubmission && (
-                        <span className="w-fit px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold rounded-md uppercase tracking-wide">
-                          Submitted
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                      <h4 className="text-base font-semibold text-slate-900 dark:text-[#f0f2f5]">{a.name}</h4>
+                      <div className="flex gap-2">
+                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-[#1a1d24] border border-slate-200 dark:border-[#242830] text-slate-600 dark:text-[#8b95a2] text-[10px] font-semibold rounded uppercase tracking-wider">
+                          Due {new Date(a.dueDate).toLocaleDateString()}
                         </span>
-                      )}
+                        {hasSubmission && (
+                          <span className="px-2 py-0.5 bg-emerald-50 dark:bg-[#052e1e] border border-emerald-200 dark:border-[#065f46] text-emerald-700 dark:text-[#10b981] text-[10px] font-semibold rounded uppercase tracking-wider">
+                            Submitted
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-slate-400 mt-3 text-sm leading-relaxed whitespace-pre-wrap">{a.description}</p>
-                    <div className="mt-5 flex items-center gap-2">
-                      <span className="inline-flex items-center rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-slate-300 ring-1 ring-inset ring-slate-700">
+                    <p className="text-slate-600 dark:text-[#8b95a2] mt-2 text-sm leading-relaxed whitespace-pre-wrap">{a.description}</p>
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center rounded-md bg-slate-50 dark:bg-[#0c0e12] px-2 py-1 text-xs font-medium text-slate-700 dark:text-[#8b95a2] border border-slate-200 dark:border-[#242830]">
                         Max Score: {a.maxMarks}
                       </span>
                       {submission?.submittedAt && (
-                        <span className="inline-flex items-center rounded-md bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-300 ring-1 ring-inset ring-emerald-500/20">
-                          Uploaded {new Date(submission.submittedAt).toLocaleString()}
+                        <span className="inline-flex items-center rounded-md bg-white dark:bg-[#1a1d24] px-2 py-1 text-xs font-medium text-slate-500 dark:text-[#5a6474] border border-slate-200 dark:border-[#242830]">
+                          Uploaded {new Date(submission.submittedAt).toLocaleDateString()}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="md:w-56 shrink-0 flex flex-col">
+                  <div className="md:w-48 shrink-0 flex flex-col pt-1">
                     {uploadProgress[a._id] ? (
-                      <div className="w-full bg-slate-900 rounded-lg p-3 border border-slate-700">
-                        <div className="w-full bg-slate-800 rounded-full h-2 mb-2 relative overflow-hidden">
-                          <div className="bg-blue-500 h-2 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(79,70,229,0.5)]" style={{ width: `${uploadProgress[a._id]}%` }} />
+                      <div className="w-full bg-slate-50 dark:bg-[#1a1d24] rounded-md p-3 border border-slate-200 dark:border-[#242830]">
+                        <div className="w-full bg-slate-200 dark:bg-[#242830] rounded-full h-1.5 mb-2 overflow-hidden">
+                          <div className="bg-blue-600 dark:bg-blue-500 h-1.5 rounded-full transition-all duration-300" style={{ width: `${uploadProgress[a._id]}%` }} />
                         </div>
-                        <span className="text-xs font-bold text-center block animate-pulse text-blue-400 uppercase tracking-widest">Uploading {Math.floor(uploadProgress[a._id])}%</span>
+                        <span className="text-[10px] font-bold text-center block text-blue-600 dark:text-blue-400 uppercase tracking-widest">Uploading {Math.floor(uploadProgress[a._id])}%</span>
                       </div>
                     ) : (
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-2">
                         {hasSubmission && submission?._id && (
                           <button
                             disabled={!!uploadingAssignmentId}
                             onClick={() => handleViewSubmission(submission._id)}
-                            className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-900/80 px-4 py-3 text-sm font-semibold text-slate-100 shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 transition-all disabled:opacity-50"
+                            className="w-full flex items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-[#242830] bg-white dark:bg-[#1a1d24] px-3 py-2 text-xs font-semibold text-slate-700 dark:text-[#f0f2f5] hover:bg-slate-50 dark:hover:bg-[#242830] transition-colors disabled:opacity-50"
                           >
-                            <Eye size={18} /> View Submission
+                            <Eye size={14} /> View File
                           </button>
                         )}
                         <button
                           disabled={!!uploadingAssignmentId}
                           onClick={() => handleUploadClick(a._id)}
-                          className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 transition-all hover:shadow-[0_0_15px_rgba(79,70,229,0.4)] disabled:opacity-50 disabled:hover:bg-blue-600 disabled:hover:shadow-none"
+                          className={`w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors disabled:opacity-50 ${
+                            hasSubmission 
+                              ? 'bg-slate-100 dark:bg-[#242830] text-slate-700 dark:text-[#f0f2f5] hover:bg-slate-200 dark:hover:bg-[#2d323c]'
+                              : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500'
+                          }`}
                         >
-                          {hasSubmission ? <Pencil size={18} /> : <UploadCloud size={18} />}
-                          {hasSubmission ? 'Replace Submission' : 'Submit Work'}
+                          {hasSubmission ? <Pencil size={14} /> : <UploadCloud size={14} />}
+                          {hasSubmission ? 'Replace File' : 'Submit Work'}
                         </button>
                       </div>
                     )}

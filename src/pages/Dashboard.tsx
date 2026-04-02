@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { BookOpen, CheckCircle, ClipboardList, TrendingUp } from 'lucide-react';
+import { BookOpen, CheckCircle2, ClipboardList, TrendingUp, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import api, { getStudentAttendance } from '../api';
 
@@ -40,51 +40,57 @@ export default function Dashboard() {
   const overallAttendanceHasClasses = (attendance?.metrics ?? []).some((m: any) => (m.totalClasses ?? 0) > 0);
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-100 font-sans">
-      <div className="bg-gradient-to-br from-slate-900 via-blue-900/40 pos to-slate-900 rounded-3xl p-8 shadow-sm border border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-        <h2 className="text-3xl font-extrabold mb-2 tracking-tight z-10 relative">Welcome back, {user?.name.split(' ')[0]}! 👋</h2>
-        <p className="text-slate-400 text-lg z-10 relative">Ready to continue your learning journey today?</p>
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 font-sans">
+      
+      {/* Welcome Header */}
+      <div className="border-b border-slate-200 dark:border-[#242830] pb-6">
+        <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-[#f0f2f5]">
+          Welcome, {user?.name.split(' ')[0]}
+        </h2>
+        <p className="mt-2 text-slate-500 dark:text-[#8b95a2] text-lg">
+          Here's an overview of your progress and active curriculum.
+        </p>
       </div>
 
+      {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4 hover:bg-slate-800 transition-colors">
-          <div className="p-4 bg-blue-500/10 text-blue-400 rounded-xl">
-            <BookOpen size={24} />
+        <div className="bg-white dark:bg-[#13151a] p-6 rounded-xl border border-slate-200 dark:border-[#242830] shadow-sm flex items-start gap-4">
+          <div className="p-3 bg-blue-50 dark:bg-[#1e2a3d] text-blue-600 dark:text-blue-400 rounded-lg">
+            <BookOpen size={20} />
           </div>
           <div>
-            <p className="text-slate-400 text-sm font-semibold">Active Courses</p>
-            <p className="text-2xl font-bold text-white">{loading ? '-' : batches.length}</p>
+            <p className="text-slate-500 dark:text-[#8b95a2] text-sm font-medium">Active Courses</p>
+            <p className="text-2xl font-semibold text-slate-900 dark:text-[#f0f2f5] mt-1">{loading ? '-' : batches.length}</p>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4 hover:bg-slate-800 transition-colors">
-          <div className="p-4 bg-emerald-500/10 text-emerald-400 rounded-xl">
-            <CheckCircle size={24} />
+        <div className="bg-white dark:bg-[#13151a] p-6 rounded-xl border border-slate-200 dark:border-[#242830] shadow-sm flex items-start gap-4">
+          <div className="p-3 bg-emerald-50 dark:bg-[#052e1e] text-emerald-600 dark:text-[#10b981] rounded-lg">
+            <CheckCircle2 size={20} />
           </div>
           <div>
-            <p className="text-slate-400 text-sm font-semibold">Assignments Done</p>
-            <p className="text-2xl font-bold text-white">-</p>
+            <p className="text-slate-500 dark:text-[#8b95a2] text-sm font-medium">Assignments Done</p>
+            <p className="text-2xl font-semibold text-slate-900 dark:text-[#f0f2f5] mt-1">-</p>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4 hover:bg-slate-800 transition-colors">
-          <div className={`p-4 rounded-xl ${
+        <div className="bg-white dark:bg-[#13151a] p-6 rounded-xl border border-slate-200 dark:border-[#242830] shadow-sm flex items-start gap-4">
+          <div className={`p-3 rounded-lg ${
             !overallAttendanceHasClasses
-              ? 'bg-slate-700/40 text-slate-300'
+              ? 'bg-slate-100 dark:bg-[#1a1d24] text-slate-500 dark:text-[#5a6474]'
               : overallPct !== null && overallPct < 75
-                ? 'bg-red-500/10 text-red-400'
-                : 'bg-emerald-500/10 text-emerald-400'
+                ? 'bg-amber-50 dark:bg-[#2d2008] text-amber-600 dark:text-[#f59e0b]'
+                : 'bg-emerald-50 dark:bg-[#052e1e] text-emerald-600 dark:text-[#10b981]'
           }`}>
-            <TrendingUp size={24} />
+            <TrendingUp size={20} />
           </div>
           <div>
-            <p className="text-slate-400 text-sm font-semibold">Attendance</p>
-            <p className="text-2xl font-bold text-white">
+            <p className="text-slate-500 dark:text-[#8b95a2] text-sm font-medium">Attendance</p>
+            <p className="text-2xl font-semibold text-slate-900 dark:text-[#f0f2f5] mt-1">
               {attendanceLoading ? '-' : overallPct !== null ? `${overallPct}%` : '--'}
             </p>
             {!attendanceLoading && !overallAttendanceHasClasses && (
-              <p className="text-xs text-slate-500">No classes held yet</p>
+              <p className="text-xs text-slate-400 dark:text-[#5a6474] mt-1">No classes yet</p>
             )}
           </div>
         </div>
@@ -92,30 +98,34 @@ export default function Dashboard() {
 
       {/* ─── Attendance Breakdown ─── */}
       {!attendanceLoading && attendance?.metrics && attendance.metrics.length > 0 && (
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <ClipboardList className="w-6 h-6 text-blue-400" />
-            <h3 className="text-2xl font-bold text-white tracking-tight">Attendance Breakdown</h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <ClipboardList className="w-5 h-5 text-slate-400 dark:text-[#5a6474]" />
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-[#f0f2f5]">Attendance Breakdown</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {attendance.metrics.map((m: any) => {
               const hasClasses = (m.totalClasses ?? 0) > 0;
-              const pctColor = !hasClasses ? 'text-slate-300' : m.percentage >= 75 ? 'text-emerald-400' : m.percentage >= 50 ? 'text-amber-400' : 'text-red-400';
-              const barColor = !hasClasses ? 'bg-slate-500' : m.percentage >= 75 ? 'bg-emerald-500' : m.percentage >= 50 ? 'bg-amber-500' : 'bg-red-500';
+              const pctColor = !hasClasses ? 'text-slate-400 dark:text-[#5a6474]' : m.percentage >= 75 ? 'text-emerald-600 dark:text-[#10b981]' : m.percentage >= 50 ? 'text-amber-600 dark:text-[#f59e0b]' : 'text-red-600 dark:text-[#ef4444]';
+              const barColor = !hasClasses ? 'bg-slate-300 dark:bg-[#242830]' : m.percentage >= 75 ? 'bg-emerald-500 dark:bg-[#10b981]' : m.percentage >= 50 ? 'bg-amber-500 dark:bg-[#f59e0b]' : 'bg-red-500 dark:bg-[#ef4444]';
               return (
-                <div key={m.batchId} className="rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 space-y-3">
-                  <div>
-                    <h4 className="text-sm font-semibold text-white truncate">{m.batchName}</h4>
-                    <p className="text-xs text-slate-400 truncate">{m.courseName || 'Unknown Course'}</p>
+                <div key={m.batchId} className="rounded-xl bg-white dark:bg-[#13151a] border border-slate-200 dark:border-[#242830] p-5">
+                  <div className="flex items-end justify-between mb-4">
+                    <div>
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-white truncate">{m.batchName}</h4>
+                      <p className="text-xs text-slate-500 dark:text-[#8b95a2] mt-0.5">{m.courseName || 'Unknown Course'}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`text-2xl font-bold ${pctColor}`}>{hasClasses ? `${m.percentage}%` : '--'}</span>
+                    </div>
                   </div>
-                  <div className="flex items-end justify-between">
-                    <span className={`text-3xl font-extrabold ${pctColor}`}>{hasClasses ? `${m.percentage}%` : '--'}</span>
-                    <span className="text-xs text-slate-500">
-                      {hasClasses ? `${m.attendedClasses} / ${m.totalClasses} classes` : 'No classes held yet'}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 bg-slate-100 dark:bg-[#1a1d24] rounded-full h-1.5 overflow-hidden">
+                      <div className={`${barColor} h-1.5 rounded-full transition-all duration-500`} style={{ width: `${hasClasses ? m.percentage : 0}%` }}></div>
+                    </div>
+                    <span className="text-xs font-medium text-slate-500 dark:text-[#8b95a2] shrink-0">
+                      {hasClasses ? `${m.attendedClasses}/${m.totalClasses}` : 'None'}
                     </span>
-                  </div>
-                  <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                    <div className={`${barColor} h-2 rounded-full transition-all duration-500`} style={{ width: `${hasClasses ? m.percentage : 0}%` }}></div>
                   </div>
                 </div>
               );
@@ -125,43 +135,41 @@ export default function Dashboard() {
       )}
 
       {/* ─── Enrolled Batches ─── */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-white tracking-tight">Your Enrolled Batches</h3>
-          <Link to="/courses" className="text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 px-4 py-2 rounded-lg">
-            View all
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-[#f0f2f5]">Enrolled Curriculum</h3>
+          <Link to="/courses" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors flex items-center gap-1">
+            View all <ArrowRight size={14} />
           </Link>
         </div>
         
         {loading ? (
-          <div className="text-center py-12 text-slate-500 font-medium">Loading batches...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-50">
+            {[1, 2, 3].map(n => <div key={n} className="h-40 bg-slate-100 dark:bg-[#13151a] rounded-xl animate-pulse border border-slate-200 dark:border-[#242830]" />)}
+          </div>
         ) : batches.length === 0 ? (
-           <div className="rounded-2xl border border-slate-700/50 bg-slate-800/20 p-12 text-center flex flex-col items-center justify-center">
-            <h3 className="text-xl font-semibold text-slate-200">No courses yet</h3>
-            <p className="mt-2 text-sm text-slate-400 max-w-sm mx-auto">You are not enrolled in any active curriculums right now.</p>
+           <div className="rounded-xl border border-dashed border-slate-300 dark:border-[#242830] bg-slate-50 border-slate-200 dark:bg-[#13151a] p-12 text-center">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">No courses yet</h3>
+            <p className="mt-1 text-sm text-slate-500 dark:text-[#8b95a2]">You are not enrolled in any active curriculums right now.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {batches.map((batch: any) => (
               <Link 
                 key={batch._id} 
                 to={`/courses/${batch._id}`}
-                className="group flex flex-col justify-between overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-6 transition-all hover:bg-slate-800 hover:border-slate-600 hover:shadow-lg hover:-translate-y-1"
+                className="group flex flex-col justify-between rounded-xl bg-white dark:bg-[#13151a] border border-slate-200 dark:border-[#242830] p-5 transition-shadow hover:shadow-md hover:border-slate-300 dark:hover:border-[#5a6474]"
               >
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="inline-flex items-center rounded-md bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="inline-flex items-center rounded bg-blue-50 dark:bg-[#1e2a3d] px-2 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30">
                       Batch
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-100 group-hover:text-blue-400 transition-colors line-clamp-1">{batch.name}</h3>
-                  <p className="mt-2 text-sm text-slate-400 line-clamp-2">
-                    Course material: {batch.course?.name || 'Unknown Course'}
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-[#f0f2f5] group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">{batch.name}</h3>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-[#8b95a2] line-clamp-1">
+                    {batch.course?.name || 'Unknown Course'}
                   </p>
-                </div>
-                <div className="mt-6 flex items-center justify-between text-sm text-slate-300 group-hover:text-blue-300">
-                  <span className="font-medium">Enter course</span>
-                  <BookOpen className="h-4 w-4" />
                 </div>
               </Link>
             ))}
