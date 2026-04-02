@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router';
-import { Video, FileText, UploadCloud, PlayCircle } from 'lucide-react';
+import { Video, FileText, UploadCloud, PlayCircle, TrendingUp } from 'lucide-react';
 import axios from 'axios';
-import api from '../api';
+import api, { getStudentAttendance } from '../api';
 
 export default function CourseDetails() {
   const { batchId } = useParams();
@@ -20,6 +20,9 @@ export default function CourseDetails() {
   const [uploadingAssignmentId, setUploadingAssignmentId] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Attendance for this batch
+  const [batchAttendance, setBatchAttendance] = useState<any>(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -47,7 +50,18 @@ export default function CourseDetails() {
         setLoading(false);
       }
     };
+    const fetchAttendance = async () => {
+      try {
+        const res = await getStudentAttendance();
+        const metrics = res.data.metrics || [];
+        const match = metrics.find((m: any) => m.batchId === batchId);
+        if (match) setBatchAttendance(match);
+      } catch (err) {
+        console.error(err);
+      }
+    };
     fetchDetails();
+    fetchAttendance();
   }, [batchId]);
 
   const handlePlayLecture = async (lectureId: string, title: string) => {
@@ -135,6 +149,35 @@ export default function CourseDetails() {
         <h1 className="text-4xl font-extrabold mb-2 tracking-tight text-white">{batch.name}</h1>
         <p className="text-blue-200/80 text-lg">{batch.course?.name || "Premium Course Material"}</p>
       </div>
+
+      {/* Attendance Banner */}
+      {batchAttendance && (
+        <div className={`rounded-2xl p-5 border flex items-center justify-between ${
+          batchAttendance.percentage >= 75 
+            ? 'bg-emerald-500/5 border-emerald-500/20' 
+            : batchAttendance.percentage >= 50 
+              ? 'bg-amber-500/5 border-amber-500/20'
+              : 'bg-red-500/5 border-red-500/20'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`p-3 rounded-xl ${batchAttendance.percentage >= 75 ? 'bg-emerald-500/10' : batchAttendance.percentage >= 50 ? 'bg-amber-500/10' : 'bg-red-500/10'}`}>
+              <TrendingUp className={`w-5 h-5 ${batchAttendance.percentage >= 75 ? 'text-emerald-400' : batchAttendance.percentage >= 50 ? 'text-amber-400' : 'text-red-400'}`} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">Your Attendance</p>
+              <p className="text-xs text-slate-400">{batchAttendance.attendedClasses} of {batchAttendance.totalClasses} classes attended</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-24 bg-slate-700 rounded-full h-2 overflow-hidden">
+              <div className={`h-2 rounded-full transition-all duration-500 ${batchAttendance.percentage >= 75 ? 'bg-emerald-500' : batchAttendance.percentage >= 50 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${batchAttendance.percentage}%` }}></div>
+            </div>
+            <span className={`text-2xl font-extrabold ${batchAttendance.percentage >= 75 ? 'text-emerald-400' : batchAttendance.percentage >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+              {batchAttendance.percentage}%
+            </span>
+          </div>
+        </div>
+      )}
 
       {activeVideo && (
         <div className="bg-black rounded-3xl overflow-hidden shadow-2xl relative border border-slate-800 animate-in zoom-in-95 duration-300">

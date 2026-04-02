@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { BookOpen, Calendar, CheckCircle } from 'lucide-react';
+import { BookOpen, CheckCircle, ClipboardList, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router';
-import api from '../api';
+import api, { getStudentAttendance } from '../api';
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [attendance, setAttendance] = useState<any>(null);
+  const [attendanceLoading, setAttendanceLoading] = useState(true);
 
   useEffect(() => {
     const fetchBatches = async () => {
@@ -20,8 +22,21 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
+    const fetchAttendance = async () => {
+      try {
+        const response = await getStudentAttendance();
+        setAttendance(response.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setAttendanceLoading(false);
+      }
+    };
     fetchBatches();
+    fetchAttendance();
   }, []);
+
+  const overallPct = attendance?.overallPercentage ?? null;
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-100 font-sans">
@@ -53,16 +68,48 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4 hover:bg-slate-800 transition-colors">
-          <div className="p-4 bg-amber-500/10 text-amber-400 rounded-xl">
-            <Calendar size={24} />
+          <div className={`p-4 rounded-xl ${overallPct !== null && overallPct < 75 ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+            <TrendingUp size={24} />
           </div>
           <div>
-            <p className="text-slate-400 text-sm font-semibold">Upcoming Deadlines</p>
-            <p className="text-2xl font-bold text-white">-</p>
+            <p className="text-slate-400 text-sm font-semibold">Attendance</p>
+            <p className="text-2xl font-bold text-white">{attendanceLoading ? '-' : overallPct !== null ? `${overallPct}%` : '-'}</p>
           </div>
         </div>
       </div>
 
+      {/* ─── Attendance Breakdown ─── */}
+      {!attendanceLoading && attendance?.metrics && attendance.metrics.length > 0 && (
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <ClipboardList className="w-6 h-6 text-blue-400" />
+            <h3 className="text-2xl font-bold text-white tracking-tight">Attendance Breakdown</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {attendance.metrics.map((m: any) => {
+              const pctColor = m.percentage >= 75 ? 'text-emerald-400' : m.percentage >= 50 ? 'text-amber-400' : 'text-red-400';
+              const barColor = m.percentage >= 75 ? 'bg-emerald-500' : m.percentage >= 50 ? 'bg-amber-500' : 'bg-red-500';
+              return (
+                <div key={m.batchId} className="rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 space-y-3">
+                  <div>
+                    <h4 className="text-sm font-semibold text-white truncate">{m.batchName}</h4>
+                    <p className="text-xs text-slate-400 truncate">{m.courseName || 'Unknown Course'}</p>
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <span className={`text-3xl font-extrabold ${pctColor}`}>{m.percentage}%</span>
+                    <span className="text-xs text-slate-500">{m.attendedClasses} / {m.totalClasses} classes</span>
+                  </div>
+                  <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+                    <div className={`${barColor} h-2 rounded-full transition-all duration-500`} style={{ width: `${m.percentage}%` }}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ─── Enrolled Batches ─── */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-white tracking-tight">Your Enrolled Batches</h3>
