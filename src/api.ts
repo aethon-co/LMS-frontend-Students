@@ -15,3 +15,15 @@ api.interceptors.request.use((config) => {
 export default api;
 
 export const getStudentAttendance = () => api.get('/attendance');
+
+export const uploadAssignmentViaApi = (
+  assignmentId: string,
+  file: File,
+  onUploadProgress?: (progressEvent: { loaded: number; total?: number }) => void
+) =>
+  api.put(`/assignments/${assignmentId}/upload`, file, {
+    headers: {
+      'Content-Type': file.type || 'application/octet-stream',
+    },
+    onUploadProgress,
+  });

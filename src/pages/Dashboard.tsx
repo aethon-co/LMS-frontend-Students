@@ -37,6 +37,7 @@ export default function Dashboard() {
   }, []);
 
   const overallPct = attendance?.overallPercentage ?? null;
+  const overallAttendanceHasClasses = (attendance?.metrics ?? []).some((m: any) => (m.totalClasses ?? 0) > 0);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-100 font-sans">
@@ -68,12 +69,23 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4 hover:bg-slate-800 transition-colors">
-          <div className={`p-4 rounded-xl ${overallPct !== null && overallPct < 75 ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+          <div className={`p-4 rounded-xl ${
+            !overallAttendanceHasClasses
+              ? 'bg-slate-700/40 text-slate-300'
+              : overallPct !== null && overallPct < 75
+                ? 'bg-red-500/10 text-red-400'
+                : 'bg-emerald-500/10 text-emerald-400'
+          }`}>
             <TrendingUp size={24} />
           </div>
           <div>
             <p className="text-slate-400 text-sm font-semibold">Attendance</p>
-            <p className="text-2xl font-bold text-white">{attendanceLoading ? '-' : overallPct !== null ? `${overallPct}%` : '-'}</p>
+            <p className="text-2xl font-bold text-white">
+              {attendanceLoading ? '-' : overallPct !== null ? `${overallPct}%` : '--'}
+            </p>
+            {!attendanceLoading && !overallAttendanceHasClasses && (
+              <p className="text-xs text-slate-500">No classes held yet</p>
+            )}
           </div>
         </div>
       </div>
@@ -87,8 +99,9 @@ export default function Dashboard() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {attendance.metrics.map((m: any) => {
-              const pctColor = m.percentage >= 75 ? 'text-emerald-400' : m.percentage >= 50 ? 'text-amber-400' : 'text-red-400';
-              const barColor = m.percentage >= 75 ? 'bg-emerald-500' : m.percentage >= 50 ? 'bg-amber-500' : 'bg-red-500';
+              const hasClasses = (m.totalClasses ?? 0) > 0;
+              const pctColor = !hasClasses ? 'text-slate-300' : m.percentage >= 75 ? 'text-emerald-400' : m.percentage >= 50 ? 'text-amber-400' : 'text-red-400';
+              const barColor = !hasClasses ? 'bg-slate-500' : m.percentage >= 75 ? 'bg-emerald-500' : m.percentage >= 50 ? 'bg-amber-500' : 'bg-red-500';
               return (
                 <div key={m.batchId} className="rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 space-y-3">
                   <div>
@@ -96,11 +109,13 @@ export default function Dashboard() {
                     <p className="text-xs text-slate-400 truncate">{m.courseName || 'Unknown Course'}</p>
                   </div>
                   <div className="flex items-end justify-between">
-                    <span className={`text-3xl font-extrabold ${pctColor}`}>{m.percentage}%</span>
-                    <span className="text-xs text-slate-500">{m.attendedClasses} / {m.totalClasses} classes</span>
+                    <span className={`text-3xl font-extrabold ${pctColor}`}>{hasClasses ? `${m.percentage}%` : '--'}</span>
+                    <span className="text-xs text-slate-500">
+                      {hasClasses ? `${m.attendedClasses} / ${m.totalClasses} classes` : 'No classes held yet'}
+                    </span>
                   </div>
                   <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                    <div className={`${barColor} h-2 rounded-full transition-all duration-500`} style={{ width: `${m.percentage}%` }}></div>
+                    <div className={`${barColor} h-2 rounded-full transition-all duration-500`} style={{ width: `${hasClasses ? m.percentage : 0}%` }}></div>
                   </div>
                 </div>
               );
