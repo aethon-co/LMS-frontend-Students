@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, Shield, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import api from '../api';
 
 export default function Login() {
@@ -144,8 +144,7 @@ export default function Login() {
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
         <div className="z-10 flex w-full justify-end">
           <div className="flex items-center gap-2 text-2xl font-bold tracking-tight text-white">
-            <Shield className="h-8 w-8 text-blue-400" />
-            LogicBox LMS
+            <img src="/logo.svg" alt="LogicBox LMS" className="h-10 w-auto" />
           </div>
         </div>
         <div className="z-10 max-w-lg self-end text-right">

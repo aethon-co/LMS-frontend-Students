@@ -5,7 +5,6 @@ import {
   BookOpen, 
   LayoutDashboard, 
   LogOut, 
-  Shield,
   User as UserIcon,
   Moon,
   Sun
@@ -51,10 +50,7 @@ export default function Layout() {
       <aside className="w-64 bg-white dark:bg-[#13151a] border-r border-slate-200 dark:border-[#242830] hidden md:flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-[#242830]">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-              <Shield className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">LogicBox</span>
+            <img src="/logo.svg" alt="LogicBox" className="h-8 w-auto shrink-0" />
           </div>
         </div>
 
